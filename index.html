@@ -1,0 +1,538 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>搜书</title>
+    <link href="css/bootstrap.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        :root {
+            --primary-color: #2c3e50;
+            --secondary-color: #f5f5f5;
+            --accent-color: #3498db;
+            --text-color: #333;
+            --light-text: #7c8ca0;
+        }
+        body {
+            background-color: var(--secondary-color);
+            font-family: 'Segoe UI', Roboto, Arial, sans-serif;
+            color: var(--text-color);
+        }
+        .search-container {
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            transition: all 0.5s ease;
+            padding: 2rem 0;
+        }
+        .search-container.results-shown {
+            min-height: auto;
+            margin-top: 2rem;
+            margin-bottom: 3rem;
+        }
+        .search-box {
+            width: 90%;
+            max-width: 800px;
+            transition: all 0.5s ease;
+        }
+        .search-title {
+            color: var(--primary-color);
+            margin-bottom: 2.5rem;
+            text-align: center;
+            font-weight: 600;
+            font-size: 2.5rem;
+            letter-spacing: -0.5px;
+        }
+        .search-input-container {
+            margin-bottom: 1.5rem;
+            position: relative;
+            box-shadow: 0 5px 15px rgba(0,0,0,0.08);
+            border-radius: 8px;
+            background-color: white;
+        }
+        .search-input {
+            height: 64px;
+            font-size: 1.2rem;
+            padding: 1rem 1.5rem;
+            border: none;
+            border-radius: 8px;
+            box-shadow: none;
+        }
+        .search-input:focus {
+            box-shadow: none;
+            border: 1px solid var(--accent-color);
+        }
+        .search-btn {
+            position: absolute;
+            right: 8px;
+            top: 8px;
+            height: 48px;
+            padding: 0 1.8rem;
+            font-size: 1rem;
+            background-color: var(--accent-color);
+            border: none;
+            border-radius: 6px;
+            color: white;
+            font-weight: 500;
+            transition: all 0.3s;
+            z-index: 10;
+        }
+        .search-btn:hover {
+            background-color: #2980b9;
+            transform: translateY(-2px);
+        }
+        .results-container {
+            display: none;
+            width: 100%;
+            padding: 1rem;
+            margin-top: 2rem;
+            max-width: 1200px;
+        }
+        .book-card {
+            border-radius: 8px;
+            overflow: hidden;
+            box-shadow: 0 5px 15px rgba(0,0,0,0.08);
+            transition: all 0.3s;
+            height: 100%;
+            background-color: white;
+            border: none;
+        }
+        .book-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 15px 30px rgba(0,0,0,0.1);
+        }
+        .card-img-container {
+            height: 220px;
+            overflow: hidden;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            background-color: #f8f8f8;
+            border-bottom: 1px solid #eee;
+        }
+        .card-img-container img {
+            max-height: 100%;
+            max-width: 100%;
+            object-fit: contain;
+        }
+        .card-body {
+            padding: 1.5rem;
+        }
+        .book-title {
+            font-weight: 600;
+            font-size: 1.1rem;
+            height: 2.6rem;
+            overflow: hidden;
+            text-overflow: ellipsis;
+            display: -webkit-box;
+            -webkit-line-clamp: 2;
+            -webkit-box-orient: vertical;
+            color: var(--primary-color);
+            margin-bottom: 0.7rem;
+        }
+        .book-author {
+            color: var(--light-text);
+            font-size: 0.95rem;
+            margin-bottom: 0.7rem;
+        }
+        .book-details {
+            font-size: 0.85rem;
+            color: var(--light-text);
+            margin-bottom: 1.2rem;
+        }
+        .book-details p {
+            margin-bottom: 0.3rem;
+        }
+        .download-btn {
+            background-color: var(--primary-color);
+            border: none;
+            border-radius: 6px;
+            width: 100%;
+            padding: 0.7rem;
+            transition: all 0.3s;
+            font-weight: 500;
+        }
+        .download-btn:hover {
+            background-color: #34495e;
+        }
+        .email-modal .modal-content {
+            border-radius: 8px;
+            border: none;
+            box-shadow: 0 15px 30px rgba(0,0,0,0.15);
+        }
+        .email-modal .modal-header {
+            background-color: var(--primary-color);
+            color: white;
+            padding: 1rem 1.5rem;
+            border-bottom: none;
+        }
+        .email-modal .modal-body {
+            padding: 1.5rem;
+        }
+        .email-modal .modal-footer {
+            border-top: none;
+            padding: 1rem 1.5rem 1.5rem;
+        }
+        .email-modal .close {
+            color: white;
+            opacity: 0.8;
+        }
+        .email-modal .form-control {
+            height: 50px;
+            border-radius: 6px;
+        }
+        .spinner-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-color: rgba(255, 255, 255, 0.8);
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            z-index: 9999;
+            visibility: hidden;
+            opacity: 0;
+            transition: all 0.3s;
+        }
+        .spinner-overlay.show {
+            visibility: visible;
+            opacity: 1;
+        }
+        .spinner-border {
+            width: 3rem;
+            height: 3rem;
+            border-width: 0.25rem;
+        }
+        .no-results {
+            text-align: center;
+            padding: 3rem;
+            color: var(--light-text);
+            background-color: white;
+            border-radius: 8px;
+            box-shadow: 0 5px 15px rgba(0,0,0,0.08);
+        }
+        .note-text {
+            color: var(--light-text);
+            font-size: 0.9rem;
+            margin-top: 1rem;
+        }
+        .custom-notification {
+            position: fixed;
+            top: 20px;
+            right: 20px;
+            width: 350px;
+            background-color: white;
+            border-radius: 8px;
+            box-shadow: 0 5px 15px rgba(0,0,0,0.15);
+            z-index: 9999;
+            overflow: hidden;
+            transform: translateX(400px);
+            transition: transform 0.3s ease;
+        }
+        .custom-notification.show {
+            transform: translateX(0);
+        }
+        .notification-header {
+            padding: 12px 15px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            border-bottom: 1px solid #eee;
+        }
+        .notification-body {
+            padding: 15px;
+            font-size: 0.9rem;
+        }
+        .custom-notification.success .notification-header {
+            background-color: #f8fffa;
+        }
+        .custom-notification.error .notification-header {
+            background-color: #fff8f8;
+        }
+        .download-btn.disabled {
+            opacity: 0.7;
+            cursor: not-allowed;
+        }
+    </style>
+</head>
+<body>
+    <div class="search-container">
+        <div class="search-box">
+            <h1 class="search-title">图书搜索</h1>
+            <div class="search-input-container">
+                <input id="keyword" type="text" class="form-control search-input" placeholder="输入书名、作者或ISBN...">
+                <button id="search" class="btn search-btn">
+                    <i class="fas fa-search"></i> 搜索
+                </button>
+            </div>
+            <p class="text-center note-text">发送链接至邮箱，请确保邮箱地址正确</p>
+        </div>
+    </div>
+
+    <div class="container results-container">
+        <div class="row" id="results-row">
+            <!-- 搜索结果将在这里以卡片形式显示 -->
+        </div>
+    </div>
+
+    <!-- 加载动画 -->
+    <div class="spinner-overlay" id="loading-spinner">
+        <div class="spinner-border text-primary" role="status">
+            <span class="sr-only">加载中...</span>
+        </div>
+    </div>
+
+    <!-- 邮箱模态框 -->
+    <div class="modal fade email-modal" id="emailModal" tabindex="-1" role="dialog" aria-labelledby="emailModalLabel" aria-hidden="true">
+        <div class="modal-dialog" role="document">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="emailModalLabel">请输入您的邮箱</h5>
+                    <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                        <span aria-hidden="true">&times;</span>
+                    </button>
+                </div>
+                <div class="modal-body">
+                    <div class="form-group">
+                        <input type="email" id="userEmail" class="form-control" placeholder="请输入您的邮箱地址">
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-dismiss="modal">取消</button>
+                    <button type="button" class="btn btn-primary" id="confirmDownload">发送</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script src="js/jquery.min.js"></script>
+    <script src="js/bootstrap.min.js"></script>
+
+    <script>
+        // 配置API地址 - 根据实际部署情况修改
+        const API_BASE_URL = 'https://booksearch.godmap.site/api';
+        
+        // 全局变量
+        var selectedBookId = '';
+        var selectedHashId = '';
+
+        // 加载动画控制
+        function showLoading() {
+            $('#loading-spinner').addClass('show');
+        }
+
+        function hideLoading() {
+            $('#loading-spinner').removeClass('show');
+        }
+
+        // 点击下载按钮时弹出邮箱输入框
+        function promptEmail(bookId, hashId) {
+            selectedBookId = bookId;
+            selectedHashId = hashId;
+            $('#emailModal').modal('show');
+        }
+
+        // 通知提示函数
+        function showNotification(title, message, type) {
+            // 如果已有通知，先移除
+            $('.custom-notification').remove();
+            
+            const iconClass = type === 'success' ? 'fas fa-check-circle text-success' : 'fas fa-exclamation-circle text-danger';
+            const notificationHtml = `
+                <div class="custom-notification ${type}">
+                    <div class="notification-header">
+                        <i class="${iconClass}"></i> ${title}
+                        <button type="button" class="close" onclick="$(this).closest('.custom-notification').remove()">
+                            <span>&times;</span>
+                        </button>
+                    </div>
+                    <div class="notification-body">
+                        ${message}
+                    </div>
+                </div>
+            `;
+            
+            $('body').append(notificationHtml);
+            setTimeout(function() {
+                $('.custom-notification').addClass('show');
+            }, 10);
+            
+            // 5秒后自动消失
+            setTimeout(function() {
+                $('.custom-notification').removeClass('show');
+                setTimeout(function() {
+                    $('.custom-notification').remove();
+                }, 300);
+            }, 5000);
+        }
+
+        // CSRF Token 处理
+        let csrfToken = '';
+        
+        // 页面加载完成后获取 CSRF Token
+        $(document).ready(function() {
+            // 获取 CSRF Token
+            $.ajax({
+                type: "GET",
+                url: `${API_BASE_URL}/check`,
+                crossDomain: true,
+                xhrFields: {
+                    withCredentials: true
+                },
+                success: function(res) {
+                    // 从响应头或响应体中获取 CSRF Token
+                    if (res && res.csrf_token) {
+                        csrfToken = res.csrf_token;
+                        console.log("CSRF Token 获取成功");
+                    } else {
+                        console.warn("服务器未返回 CSRF Token");
+                    }
+                },
+                error: function(err) {
+                    console.error("获取 CSRF Token 失败:", err);
+                }
+            });
+        });
+        
+        // 添加 CSRF Token 到 AJAX 请求
+        $.ajaxSetup({
+            beforeSend: function(xhr, settings) {
+                // 只对非 GET 请求添加 CSRF Token
+                if (!/^(GET|HEAD|OPTIONS|TRACE)$/i.test(settings.type) && csrfToken) {
+                    xhr.setRequestHeader("X-CSRFToken", csrfToken);
+                }
+            }
+        });
+
+        // 确认下载
+        $('#confirmDownload').click(function() {
+            // 防止重复点击
+            const $btn = $(this);
+            if ($btn.hasClass('disabled')) return;
+            
+            const email = $('#userEmail').val();
+            if (!email) {
+                alert('请输入有效的邮箱地址');
+                return;
+            }
+            
+            // 禁用按钮防止重复点击
+            $btn.addClass('disabled').html('<i class="fas fa-spinner fa-spin"></i> 处理中...');
+            showLoading();
+            
+            $.ajax({
+                type: "post",
+                contentType: "application/json",
+                url: `${API_BASE_URL}/download`,
+                data: JSON.stringify({ "id": selectedBookId, "hash": selectedHashId, "email": email }),
+                dataType: "json",
+                success: function(res) {
+                    hideLoading();
+                    $btn.removeClass('disabled').html('发送');
+                    
+                    if (res.status === 0) {
+                        $('#emailModal').modal('hide');
+                        // 禁用对应书籍的下载按钮
+                        $(`button[data-id="${selectedBookId}"][data-hash="${selectedHashId}"]`).addClass('disabled')
+                            .html('<i class="fas fa-check"></i> 已发送')
+                            .attr('disabled', true);
+                        
+                        // 使用更友好的提示替代alert
+                        showNotification('成功', '下载链接已发送至您的邮箱，请查收！<br>如未收到请检查垃圾邮件。', 'success');
+                    } else {
+                        showNotification('错误', res.error || '发送失败，请稍后重试', 'error');
+                    }
+                },
+                error: function(err) {
+                    hideLoading();
+                    $btn.removeClass('disabled').html('发送');
+                    showNotification('错误', '出现异常，请联系网站管理员', 'error');
+                    console.error("Error during download request:", err);
+                }
+            });
+        });
+
+        // 搜索功能
+        $("#search").click(function() {
+            const keyword = $("#keyword").val();
+            if (!keyword.trim()) {
+                alert('请输入搜索关键词');
+                return;
+            }
+            
+            showLoading();
+            $.ajax({
+                type: "post",
+                contentType: "application/json",
+                url: `${API_BASE_URL}/search`,
+                data: JSON.stringify({ "keyword": keyword }),
+                dataType: "json",
+                success: function(res) {
+                    hideLoading();
+                    
+                    // 显示结果容器
+                    $('.search-container').addClass('results-shown');
+                    $('.results-container').show();
+                    
+                    // 清空之前的结果
+                    $('#results-row').empty();
+                    
+                    // 如果没有结果
+                    if (!res || res.length === 0) {
+                        $('#results-row').html('<div class="col-12 no-results"><h3>没有找到相关书籍</h3><p>请尝试使用其他关键词搜索</p></div>');
+                        return;
+                    }
+                    
+                    // 渲染书籍卡片
+                    res.forEach(function(book) {
+                        const coverImg = book.cover ? book.cover : 'img/default-cover.jpg';
+                        const html = `
+                            <div class="col-md-4 col-lg-3 mb-4">
+                                <div class="book-card">
+                                    <div class="card-img-container">
+                                        <img src="${coverImg}" alt="${book.title}" onerror="this.src='img/default-cover.jpg'">
+                                    </div>
+                                    <div class="card-body">
+                                        <h5 class="book-title">${book.title}</h5>
+                                        <p class="book-author">${book.author || '未知作者'}</p>
+                                        <div class="book-details">
+                                            <p>出版社: ${book.publisher || '未知'}</p>
+                                            <p>语言: ${book.language || '未知'}</p>
+                                            <p>年份: ${book.year || '未知'}</p>
+                                            <p>格式: ${book.extension || '未知'} (${book.filesizeString || '未知大小'})</p>
+                                        </div>
+                                        <button class="btn btn-primary download-btn" 
+                                            onclick="promptEmail('${book.id}', '${book.hash}')"
+                                            data-id="${book.id}" 
+                                            data-hash="${book.hash}">
+                                            <i class="fas fa-download"></i> 发送至邮箱
+                                        </button>
+                                    </div>
+                                </div>
+                            </div>
+                        `;
+                        $('#results-row').append(html);
+                    });
+                },
+                error: function(err) {
+                    hideLoading();
+                    alert("搜索失败，请稍后重试");
+                    console.error("Error during search:", err);
+                }
+            });
+        });
+
+        // 按回车键搜索
+        $("#keyword").keypress(function(e) {
+            if (e.which === 13) {
+                $("#search").click();
+            }
+        });
+    </script>
+</body>
+</html> 
