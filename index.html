@@ -530,7 +530,7 @@
 
     <script>
         // 配置API地址 - 根据实际部署情况修改
-        const API_BASE_URL = '/api';
+        const API_BASE_URL = 'http://localhost:8080/api';
         
         // 全局变量
         var selectedBookId = '';
@@ -619,6 +619,11 @@
 
         // 点击验证码图片刷新
         document.getElementById('captchaImage').addEventListener('click', refreshCaptcha);
+
+        // 检查用户是否已登录
+        function isAuthenticated() {
+            return authToken !== null;
+        }
 
         // 点击下载按钮时弹出邮箱输入框
         function showDownloadModal(bookId, bookHash) {
