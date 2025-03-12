@@ -258,9 +258,137 @@
             opacity: 0.7;
             cursor: not-allowed;
         }
+        
+        /* 导航栏样式 */
+        .navbar {
+            background-color: white;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.05);
+            padding: 0.8rem 1rem;
+        }
+        .navbar-brand {
+            font-weight: 700;
+            color: var(--primary-color);
+        }
+        .nav-link {
+            color: var(--text-color);
+            transition: all 0.3s;
+            margin: 0 0.5rem;
+        }
+        .nav-link:hover {
+            color: var(--accent-color);
+        }
+        .btn-login, .btn-register {
+            border-radius: 50px;
+            padding: 0.4rem 1.2rem;
+            margin-left: 0.5rem;
+            font-weight: 500;
+        }
+        .btn-login {
+            border: 1px solid var(--accent-color);
+            color: var(--accent-color);
+            background-color: transparent;
+        }
+        .btn-login:hover {
+            background-color: var(--accent-color);
+            color: white;
+        }
+        .btn-register {
+            background-color: var(--accent-color);
+            color: white;
+            border: none;
+        }
+        .btn-register:hover {
+            background-color: #2980b9;
+        }
+        .user-info {
+            display: none;
+            align-items: center;
+        }
+        .user-avatar {
+            width: 32px;
+            height: 32px;
+            border-radius: 50%;
+            background-color: var(--accent-color);
+            color: white;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin-right: 0.5rem;
+            font-weight: 600;
+        }
+        .user-name {
+            font-weight: 600;
+            margin-right: 0.5rem;
+        }
+        .vip-badge {
+            font-size: 0.7rem;
+            padding: 0.2rem 0.5rem;
+            background-color: #f1c40f;
+            color: #7f5c00;
+            border-radius: 50px;
+            margin-right: 0.5rem;
+        }
+        .auth-modal .modal-content {
+            border-radius: 8px;
+            border: none;
+            box-shadow: 0 15px 30px rgba(0,0,0,0.15);
+        }
+        .auth-modal .modal-header {
+            border-bottom: none;
+            padding-bottom: 0;
+        }
+        .auth-modal .modal-body {
+            padding: 1.5rem;
+        }
+        .auth-modal .modal-footer {
+            border-top: none;
+            padding-top: 0;
+        }
+        .auth-form-group {
+            margin-bottom: 1.2rem;
+        }
+        .auth-form-group label {
+            font-weight: 500;
+            margin-bottom: 0.5rem;
+            color: var(--text-color);
+        }
+        .verify-code-container {
+            display: flex;
+        }
+        .verify-code-container input {
+            border-top-right-radius: 0;
+            border-bottom-right-radius: 0;
+        }
+        .btn-get-code {
+            border-top-left-radius: 0;
+            border-bottom-left-radius: 0;
+            flex-shrink: 0;
+        }
     </style>
 </head>
 <body>
+    <!-- 导航栏 -->
+    <nav class="navbar navbar-expand-lg navbar-light">
+        <div class="container">
+            <a class="navbar-brand" href="#">图书搜索</a>
+            <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarNav" aria-controls="navbarNav" aria-expanded="false" aria-label="Toggle navigation">
+                <span class="navbar-toggler-icon"></span>
+            </button>
+            <div class="collapse navbar-collapse justify-content-end" id="navbarNav">
+                <div class="auth-buttons">
+                    <button class="btn btn-login" id="btnLogin">登录</button>
+                    <button class="btn btn-register" id="btnRegister">注册</button>
+                </div>
+                <div class="user-info">
+                    <div class="user-avatar"></div>
+                    <span class="user-name"></span>
+                    <span class="vip-badge">VIP0</span>
+                    <button class="btn btn-sm btn-outline-secondary" id="btnLogout">退出</button>
+                </div>
+            </div>
+        </div>
+    </nav>
+
     <div class="search-container">
         <div class="search-box">
             <h1 class="search-title">图书搜索</h1>
@@ -280,6 +408,79 @@
         </div>
     </div>
 
+    <!-- 登录模态框 -->
+    <div class="modal fade auth-modal" id="loginModal" tabindex="-1" role="dialog" aria-hidden="true">
+        <div class="modal-dialog" role="document">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title">登录</h5>
+                    <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                        <span aria-hidden="true">&times;</span>
+                    </button>
+                </div>
+                <div class="modal-body">
+                    <form id="loginForm">
+                        <div class="auth-form-group">
+                            <label for="loginEmail">邮箱地址</label>
+                            <input type="email" class="form-control" id="loginEmail" placeholder="请输入邮箱地址">
+                        </div>
+                        <div class="auth-form-group">
+                            <label for="loginPassword">密码</label>
+                            <input type="password" class="form-control" id="loginPassword" placeholder="请输入密码">
+                        </div>
+                        <div class="alert alert-danger" id="loginError" style="display: none;"></div>
+                    </form>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-dismiss="modal">取消</button>
+                    <button type="button" class="btn btn-primary" id="submitLogin">登录</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- 注册模态框 -->
+    <div class="modal fade auth-modal" id="registerModal" tabindex="-1" role="dialog" aria-hidden="true">
+        <div class="modal-dialog" role="document">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title">注册</h5>
+                    <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                        <span aria-hidden="true">&times;</span>
+                    </button>
+                </div>
+                <div class="modal-body">
+                    <form id="registerForm">
+                        <div class="auth-form-group">
+                            <label for="registerEmail">邮箱地址</label>
+                            <input type="email" class="form-control" id="registerEmail" placeholder="请输入邮箱地址">
+                        </div>
+                        <div class="auth-form-group">
+                            <label for="registerUsername">用户名</label>
+                            <input type="text" class="form-control" id="registerUsername" placeholder="请输入用户名">
+                        </div>
+                        <div class="auth-form-group">
+                            <label for="registerPassword">密码</label>
+                            <input type="password" class="form-control" id="registerPassword" placeholder="请输入密码">
+                        </div>
+                        <div class="auth-form-group">
+                            <label for="registerVerificationCode">验证码</label>
+                            <div class="verify-code-container">
+                                <input type="text" class="form-control" id="registerVerificationCode" placeholder="请输入验证码">
+                                <button type="button" class="btn btn-outline-primary btn-get-code" id="getVerificationCode">获取验证码</button>
+                            </div>
+                        </div>
+                        <div class="alert alert-danger" id="registerError" style="display: none;"></div>
+                    </form>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-dismiss="modal">取消</button>
+                    <button type="button" class="btn btn-primary" id="submitRegister">注册</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
     <!-- 加载动画 -->
     <div class="spinner-overlay" id="loading-spinner">
         <div class="spinner-border text-primary" role="status">
@@ -287,24 +488,38 @@
         </div>
     </div>
 
-    <!-- 邮箱模态框 -->
+    <!-- 下载模态框 -->
     <div class="modal fade email-modal" id="emailModal" tabindex="-1" role="dialog" aria-labelledby="emailModalLabel" aria-hidden="true">
         <div class="modal-dialog" role="document">
             <div class="modal-content">
                 <div class="modal-header">
-                    <h5 class="modal-title" id="emailModalLabel">请输入您的邮箱</h5>
-                    <button type="button" class="close" data-dismiss="modal" aria-label="Close">
-                        <span aria-hidden="true">&times;</span>
-                    </button>
+                    <h5 class="modal-title" id="emailModalLabel">下载书籍</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
                 </div>
                 <div class="modal-body">
-                    <div class="form-group">
-                        <input type="email" id="userEmail" class="form-control" placeholder="请输入您的邮箱地址">
+                    <div class="mb-3">
+                        <label for="email" class="form-label">您的邮箱</label>
+                        <input type="email" class="form-control" id="email" placeholder="请输入您的邮箱，我们将发送下载链接到您的邮箱">
                     </div>
+                    <div class="mb-3">
+                        <label for="captchaCode" class="form-label">验证码</label>
+                        <div class="input-group">
+                            <input type="text" class="form-control" id="captchaCode" placeholder="请输入验证码">
+                            <div class="input-group-append">
+                                <span class="input-group-text p-0 border-0">
+                                    <img id="captchaImage" src="" alt="验证码" style="height: 38px; cursor: pointer;">
+                                </span>
+                            </div>
+                        </div>
+                        <small class="form-text text-muted">看不清？点击图片刷新</small>
+                    </div>
+                    <input type="hidden" id="bookId">
+                    <input type="hidden" id="bookHash">
+                    <input type="hidden" id="sessionKey">
                 </div>
                 <div class="modal-footer">
-                    <button type="button" class="btn btn-secondary" data-dismiss="modal">取消</button>
-                    <button type="button" class="btn btn-primary" id="confirmDownload">发送</button>
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">取消</button>
+                    <button type="button" class="btn btn-primary" id="downloadBtn">确认下载</button>
                 </div>
             </div>
         </div>
@@ -315,11 +530,66 @@
 
     <script>
         // 配置API地址 - 根据实际部署情况修改
-        const API_BASE_URL = 'https://book.godmap.site/api';
+        const API_BASE_URL = 'http://localhost:8080/api';
         
         // 全局变量
         var selectedBookId = '';
         var selectedHashId = '';
+        var authToken = localStorage.getItem('authToken');
+        var currentUser = null;
+
+        // 检查用户登录状态
+        function checkLoginStatus() {
+            if (authToken) {
+                // 检查令牌有效性
+                $.ajax({
+                    type: "GET",
+                    url: `${API_BASE_URL}/check`,
+                    headers: {
+                        "Authorization": `Bearer ${authToken}`
+                    },
+                    success: function(res) {
+                        if (res.is_authenticated) {
+                            // 用户已登录
+                            currentUser = {
+                                username: res.username,
+                                email: res.email,
+                                vip_level: res.vip_level
+                            };
+                            updateUIForLoggedInUser();
+                        } else {
+                            // 令牌无效，清除本地存储
+                            localStorage.removeItem('authToken');
+                            authToken = null;
+                            updateUIForLoggedOutUser();
+                        }
+                    },
+                    error: function() {
+                        // 请求失败，清除本地存储
+                        localStorage.removeItem('authToken');
+                        authToken = null;
+                        updateUIForLoggedOutUser();
+                    }
+                });
+            } else {
+                updateUIForLoggedOutUser();
+            }
+        }
+
+        // 更新已登录用户的UI
+        function updateUIForLoggedInUser() {
+            $('.auth-buttons').hide();
+            $('.user-info').css('display', 'flex');
+            $('.user-avatar').text(currentUser.username.charAt(0).toUpperCase());
+            $('.user-name').text(currentUser.username);
+            $('.vip-badge').text(`VIP${currentUser.vip_level}`);
+        }
+
+        // 更新未登录用户的UI
+        function updateUIForLoggedOutUser() {
+            $('.auth-buttons').show();
+            $('.user-info').hide();
+        }
 
         // 加载动画控制
         function showLoading() {
@@ -330,12 +600,123 @@
             $('#loading-spinner').removeClass('show');
         }
 
-        // 点击下载按钮时弹出邮箱输入框
-        function promptEmail(bookId, hashId) {
-            selectedBookId = bookId;
-            selectedHashId = hashId;
-            $('#emailModal').modal('show');
+        // 刷新验证码
+        function refreshCaptcha() {
+            fetch('/api/captcha')
+                .then(response => response.json())
+                .then(data => {
+                    if (data.status === 0) {
+                        document.getElementById('captchaImage').src = data.image;
+                        document.getElementById('sessionKey').value = data.session_key;
+                    } else {
+                        showNotification('错误', '获取验证码失败: ' + data.message, 'error');
+                    }
+                })
+                .catch(error => {
+                    showNotification('错误', '获取验证码失败: ' + error, 'error');
+                });
         }
+
+        // 点击验证码图片刷新
+        document.getElementById('captchaImage').addEventListener('click', refreshCaptcha);
+
+        // 点击下载按钮时弹出邮箱输入框
+        function showDownloadModal(bookId, bookHash) {
+            if (!isAuthenticated()) {
+                showNotification('提示', '请先登录后再下载书籍', 'error');
+                return;
+            }
+
+            const modal = document.getElementById('emailModal');
+            document.getElementById('bookId').value = bookId;
+            document.getElementById('bookHash').value = bookHash;
+            document.getElementById('email').value = currentUser.email || '';
+            
+            // 重置验证码输入框
+            document.getElementById('captchaCode').value = '';
+            
+            // 刷新验证码
+            refreshCaptcha();
+            
+            // 显示模态框
+            const modalInstance = new bootstrap.Modal(modal);
+            modalInstance.show();
+        }
+
+        // 确认下载
+        document.getElementById('downloadBtn').addEventListener('click', function() {
+            const email = document.getElementById('email').value;
+            const captchaCode = document.getElementById('captchaCode').value;
+            const bookId = document.getElementById('bookId').value;
+            const bookHash = document.getElementById('bookHash').value;
+
+            // 验证邮箱格式
+            if (!validateEmail(email)) {
+                showNotification('错误', '请输入有效的邮箱地址', 'error');
+                return;
+            }
+
+            // 验证验证码
+            if (!captchaCode) {
+                showNotification('错误', '请输入验证码', 'error');
+                return;
+            }
+
+            // 禁用下载按钮，防止重复点击
+            const downloadBtn = document.getElementById('downloadBtn');
+            downloadBtn.disabled = true;
+            downloadBtn.innerHTML = '<span class="spinner-border spinner-border-sm" role="status" aria-hidden="true"></span> 处理中...';
+
+            fetch('/api/download', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                    'Authorization': `Bearer ${getToken()}`
+                },
+                body: JSON.stringify({
+                    id: bookId,
+                    hash: bookHash,
+                    email: email,
+                    captcha_code: captchaCode
+                })
+            })
+            .then(response => response.json())
+            .then(data => {
+                // 恢复下载按钮状态
+                downloadBtn.disabled = false;
+                downloadBtn.innerHTML = '确认下载';
+
+                // 关闭模态框
+                const modal = bootstrap.Modal.getInstance(document.getElementById('emailModal'));
+                modal.hide();
+
+                if (data.status === 0) {
+                    // 禁用对应书籍的下载按钮
+                    const downloadBtns = document.querySelectorAll(`[data-book-id="${bookId}"]`);
+                    downloadBtns.forEach(btn => {
+                        btn.disabled = true;
+                        btn.innerHTML = '<i class="fas fa-check"></i> 已发送';
+                    });
+                    
+                    showNotification('成功', '下载链接已发送至您的邮箱，请查收！<br>如未收到请检查垃圾邮件。', 'success');
+                } else {
+                    showNotification('错误', data.error || '下载请求失败', 'error');
+                    
+                    // 刷新验证码
+                    refreshCaptcha();
+                }
+            })
+            .catch(error => {
+                // 恢复下载按钮状态
+                downloadBtn.disabled = false;
+                downloadBtn.innerHTML = '确认下载';
+                
+                showNotification('错误', '下载请求失败: ' + error, 'error');
+                
+                // 刷新验证码
+                refreshCaptcha();
+            });
+        });
 
         // 通知提示函数
         function showNotification(title, message, type) {
@@ -376,6 +757,8 @@
         
         // 页面加载完成后获取 CSRF Token
         $(document).ready(function() {
+            checkLoginStatus();
+            
             // 获取 CSRF Token
             $.ajax({
                 type: "GET",
@@ -397,6 +780,185 @@
                     console.error("获取 CSRF Token 失败:", err);
                 }
             });
+            
+            // 绑定登录按钮点击事件
+            $('#btnLogin').click(function() {
+                $('#loginModal').modal('show');
+            });
+            
+            // 绑定注册按钮点击事件
+            $('#btnRegister').click(function() {
+                $('#registerModal').modal('show');
+            });
+            
+            // 绑定退出按钮点击事件
+            $('#btnLogout').click(function() {
+                localStorage.removeItem('authToken');
+                authToken = null;
+                currentUser = null;
+                updateUIForLoggedOutUser();
+                showNotification('提示', '您已成功退出登录', 'success');
+            });
+            
+            // 绑定登录表单提交事件
+            $('#submitLogin').click(function() {
+                const $btn = $(this);
+                if ($btn.hasClass('disabled')) return;
+                
+                const email = $('#loginEmail').val();
+                const password = $('#loginPassword').val();
+                
+                if (!email || !password) {
+                    $('#loginError').text('请输入邮箱和密码').show();
+                    return;
+                }
+                
+                $btn.addClass('disabled').html('<i class="fas fa-spinner fa-spin"></i> 登录中...');
+                
+                $.ajax({
+                    type: "POST",
+                    url: `${API_BASE_URL}/login`,
+                    contentType: "application/json",
+                    data: JSON.stringify({
+                        email: email,
+                        password: password
+                    }),
+                    success: function(res) {
+                        $btn.removeClass('disabled').text('登录');
+                        
+                        if (res.status === 0) {
+                            // 登录成功
+                            localStorage.setItem('authToken', res.token);
+                            authToken = res.token;
+                            currentUser = {
+                                username: res.username,
+                                email: res.email,
+                                vip_level: res.vip_level
+                            };
+                            
+                            $('#loginModal').modal('hide');
+                            $('#loginForm')[0].reset();
+                            $('#loginError').hide();
+                            
+                            updateUIForLoggedInUser();
+                            showNotification('成功', '登录成功', 'success');
+                        } else {
+                            // 登录失败
+                            $('#loginError').text(res.message).show();
+                        }
+                    },
+                    error: function() {
+                        $btn.removeClass('disabled').text('登录');
+                        $('#loginError').text('登录失败，请稍后重试').show();
+                    }
+                });
+            });
+            
+            // 绑定注册表单提交事件
+            $('#submitRegister').click(function() {
+                const $btn = $(this);
+                if ($btn.hasClass('disabled')) return;
+                
+                const email = $('#registerEmail').val();
+                const username = $('#registerUsername').val();
+                const password = $('#registerPassword').val();
+                const verificationCode = $('#registerVerificationCode').val();
+                
+                if (!email || !username || !password || !verificationCode) {
+                    $('#registerError').text('请填写所有字段').show();
+                    return;
+                }
+                
+                $btn.addClass('disabled').html('<i class="fas fa-spinner fa-spin"></i> 注册中...');
+                
+                $.ajax({
+                    type: "POST",
+                    url: `${API_BASE_URL}/register`,
+                    contentType: "application/json",
+                    data: JSON.stringify({
+                        email: email,
+                        username: username,
+                        password: password,
+                        verification_code: verificationCode
+                    }),
+                    success: function(res) {
+                        $btn.removeClass('disabled').text('注册');
+                        
+                        if (res.status === 0) {
+                            // 注册成功
+                            localStorage.setItem('authToken', res.token);
+                            authToken = res.token;
+                            currentUser = {
+                                username: res.username,
+                                email: res.email,
+                                vip_level: res.vip_level
+                            };
+                            
+                            $('#registerModal').modal('hide');
+                            $('#registerForm')[0].reset();
+                            $('#registerError').hide();
+                            
+                            updateUIForLoggedInUser();
+                            showNotification('成功', '注册成功', 'success');
+                        } else {
+                            // 注册失败
+                            $('#registerError').text(res.message).show();
+                        }
+                    },
+                    error: function() {
+                        $btn.removeClass('disabled').text('注册');
+                        $('#registerError').text('注册失败，请稍后重试').show();
+                    }
+                });
+            });
+            
+            // 获取注册验证码
+            $('#getVerificationCode').click(function() {
+                const $btn = $(this);
+                if ($btn.hasClass('disabled')) return;
+                
+                const email = $('#registerEmail').val();
+                if (!email) {
+                    $('#registerError').text('请先输入邮箱地址').show();
+                    return;
+                }
+                
+                $btn.addClass('disabled').text('发送中...');
+                
+                $.ajax({
+                    type: "POST",
+                    url: `${API_BASE_URL}/send-verification-code`,
+                    contentType: "application/json",
+                    data: JSON.stringify({
+                        email: email
+                    }),
+                    success: function(res) {
+                        if (res.status === 0) {
+                            // 发送成功
+                            showNotification('成功', res.message, 'success');
+                            
+                            // 按钮倒计时
+                            let countdown = 60;
+                            const timer = setInterval(function() {
+                                $btn.text(`${countdown}秒后重试`);
+                                countdown--;
+                                if (countdown < 0) {
+                                    clearInterval(timer);
+                                    $btn.removeClass('disabled').text('获取验证码');
+                                }
+                            }, 1000);
+                        } else {
+                            // 发送失败
+                            $btn.removeClass('disabled').text('获取验证码');
+                            $('#registerError').text(res.message).show();
+                        }
+                    },
+                    error: function() {
+                        $btn.removeClass('disabled').text('获取验证码');
+                        $('#registerError').text('发送验证码失败，请稍后重试').show();
+                    }
+                });
+            });
         });
         
         // 添加 CSRF Token 到 AJAX 请求
@@ -406,62 +968,25 @@
                 if (!/^(GET|HEAD|OPTIONS|TRACE)$/i.test(settings.type) && csrfToken) {
                     xhr.setRequestHeader("X-CSRFToken", csrfToken);
                 }
-            }
-        });
-
-        // 确认下载
-        $('#confirmDownload').click(function() {
-            // 防止重复点击
-            const $btn = $(this);
-            if ($btn.hasClass('disabled')) return;
-            
-            const email = $('#userEmail').val();
-            if (!email) {
-                alert('请输入有效的邮箱地址');
-                return;
-            }
-            
-            // 禁用按钮防止重复点击
-            $btn.addClass('disabled').html('<i class="fas fa-spinner fa-spin"></i> 处理中...');
-            showLoading();
-            
-            $.ajax({
-                type: "post",
-                contentType: "application/json",
-                url: `${API_BASE_URL}/download`,
-                data: JSON.stringify({ "id": selectedBookId, "hash": selectedHashId, "email": email }),
-                dataType: "json",
-                success: function(res) {
-                    hideLoading();
-                    $btn.removeClass('disabled').html('发送');
-                    
-                    if (res.status === 0) {
-                        $('#emailModal').modal('hide');
-                        // 禁用对应书籍的下载按钮
-                        $(`button[data-id="${selectedBookId}"][data-hash="${selectedHashId}"]`).addClass('disabled')
-                            .html('<i class="fas fa-check"></i> 已发送')
-                            .attr('disabled', true);
-                        
-                        // 使用更友好的提示替代alert
-                        showNotification('成功', '下载链接已发送至您的邮箱，请查收！<br>如未收到请检查垃圾邮件。', 'success');
-                    } else {
-                        showNotification('错误', res.error || '发送失败，请稍后重试', 'error');
-                    }
-                },
-                error: function(err) {
-                    hideLoading();
-                    $btn.removeClass('disabled').html('发送');
-                    showNotification('错误', '出现异常，请联系网站管理员', 'error');
-                    console.error("Error during download request:", err);
+                // 添加Authorization头
+                if (authToken) {
+                    xhr.setRequestHeader("Authorization", `Bearer ${authToken}`);
                 }
-            });
+            }
         });
 
         // 搜索功能
         $("#search").click(function() {
+            // 检查用户是否已登录
+            if (!authToken) {
+                showNotification('提示', '请先登录后再搜索书籍', 'error');
+                $('#loginModal').modal('show');
+                return;
+            }
+            
             const keyword = $("#keyword").val();
             if (!keyword.trim()) {
-                alert('请输入搜索关键词');
+                showNotification('错误', '请输入搜索关键词', 'error');
                 return;
             }
             
@@ -481,6 +1006,12 @@
                     
                     // 清空之前的结果
                     $('#results-row').empty();
+                    
+                    // 检查是否有错误消息
+                    if (res.length === 1 && res[0].error) {
+                        $('#results-row').html(`<div class="col-12 no-results"><h3>搜索失败</h3><p>${res[0].error}</p></div>`);
+                        return;
+                    }
                     
                     // 如果没有结果
                     if (!res || res.length === 0) {
@@ -507,7 +1038,7 @@
                                             <p>格式: ${book.extension || '未知'} (${book.filesizeString || '未知大小'})</p>
                                         </div>
                                         <button class="btn btn-primary download-btn" 
-                                            onclick="promptEmail('${book.id}', '${book.hash}')"
+                                            onclick="showDownloadModal('${book.id}', '${book.hash}')"
                                             data-id="${book.id}" 
                                             data-hash="${book.hash}">
                                             <i class="fas fa-download"></i> 发送至邮箱
@@ -521,7 +1052,7 @@
                 },
                 error: function(err) {
                     hideLoading();
-                    alert("搜索失败，请稍后重试");
+                    showNotification('错误', '搜索失败，请稍后重试', 'error');
                     console.error("Error during search:", err);
                 }
             });
