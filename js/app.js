@@ -94,7 +94,7 @@ const api = {
             });
             
             // 检查状态码，如果是401或403，表示授权失效
-            if (response.status === 401 || response.status === 403) {
+            if (response.status === 401) {
                 // 返回一个错误对象，包含状态码
                 return {
                     status: -1,
