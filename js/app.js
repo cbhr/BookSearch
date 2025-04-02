@@ -92,6 +92,18 @@ const api = {
                 ...defaultOptions,
                 ...options
             });
+            
+            // 检查状态码，如果是401或403，表示授权失效
+            if (response.status === 401 || response.status === 403) {
+                // 返回一个错误对象，包含状态码
+                return {
+                    status: -1,
+                    error: '登录状态已失效，请重新登录',
+                    unauthorized: true,
+                    statusCode: response.status
+                };
+            }
+            
             return await response.json();
         } catch (error) {
             console.error('API请求失败:', error);
@@ -102,6 +114,12 @@ const api = {
     async checkAuth() {
         try {
             const res = await this.request('/check');
+            
+            // 检查是否授权失效
+            if (res.unauthorized) {
+                return { is_authenticated: false };
+            }
+            
             if (res.csrf_token) {
                 state.csrfToken = res.csrf_token;
             }
@@ -421,6 +439,19 @@ const app = {
         try {
             utils.showLoading();
             const results = await api.search(keyword);
+            
+            // 检查是否授权失效
+            if (results.unauthorized) {
+                this.logout();
+                utils.showNotification('登录已过期', '您的登录状态已失效，请重新登录', 'error');
+                if (modals.loginModal) {
+                    modals.loginModal.show();
+                } else {
+                    $('#loginModal').modal('show');
+                }
+                return;
+            }
+            
             ui.renderSearchResults(results);
         } catch (error) {
             utils.showNotification('错误', '搜索失败，请稍后重试', 'error');
@@ -619,6 +650,14 @@ const app = {
     async refreshCaptcha(type = 'download') {
         try {
             const res = await api.getCaptcha();
+            
+            // 检查是否授权失效（对于一些需要登录的验证码）
+            if (res.unauthorized) {
+                this.logout();
+                utils.showNotification('登录已过期', '您的登录状态已失效，请重新登录', 'error');
+                return null;
+            }
+            
             if (res.status === 0) {
                 // 保存会话密钥
                 sessionKeys[type] = res.session_key;
@@ -703,6 +742,28 @@ const app = {
                 captcha_code: captchaCode,
                 session_key: sessionKeys.download
             });
+            
+            // 检查是否授权失效
+            if (res.unauthorized) {
+                this.logout();
+                utils.showNotification('登录已过期', '您的登录状态已失效，请重新登录', 'error');
+                
+                if (modals.downloadModal) {
+                    modals.downloadModal.hide();
+                } else {
+                    $('#emailModal').modal('hide');
+                }
+                
+                setTimeout(() => {
+                    if (modals.loginModal) {
+                        modals.loginModal.show();
+                    } else {
+                        $('#loginModal').modal('show');
+                    }
+                }, 1000);
+                
+                return;
+            }
             
             if (res.status === 0) {
                 if (modals.downloadModal) {
