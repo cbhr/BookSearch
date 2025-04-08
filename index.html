@@ -3,436 +3,220 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>搜书</title>
-    <link href="css/bootstrap.min.css" rel="stylesheet">
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <title>图书搜索</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
     <style>
         :root {
-            --primary-color: #2c3e50;
-            --secondary-color: #f5f5f5;
-            --accent-color: #3498db;
-            --text-color: #333;
-            --light-text: #7c8ca0;
+            --bs-primary: #2c3e50;
+            --bs-secondary: #95a5a6;
+            --bs-success: #27ae60;
+            --bs-info: #3498db;
+            --bs-warning: #f1c40f;
+            --bs-danger: #e74c3c;
         }
+        
         body {
-            background-color: var(--secondary-color);
-            font-family: 'Segoe UI', Roboto, Arial, sans-serif;
-            color: var(--text-color);
+            background-color: #f8f9fa;
         }
+
+        .navbar {
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+        }
+
         .search-container {
-            min-height: 100vh;
-            display: flex;
-            flex-direction: column;
-            justify-content: center;
-            align-items: center;
-            transition: all 0.5s ease;
+            min-height: 80vh;
             padding: 2rem 0;
+            transition: all 0.3s ease;
         }
+
         .search-container.results-shown {
             min-height: auto;
-            margin-top: 2rem;
-            margin-bottom: 3rem;
+            padding: 1rem 0;
         }
-        .search-box {
-            width: 90%;
-            max-width: 800px;
-            transition: all 0.5s ease;
-        }
+
         .search-title {
-            color: var(--primary-color);
-            margin-bottom: 2.5rem;
-            text-align: center;
+            color: var(--bs-primary);
             font-weight: 600;
-            font-size: 2.5rem;
-            letter-spacing: -0.5px;
+            margin-bottom: 2rem;
         }
-        .search-input-container {
-            margin-bottom: 1.5rem;
-            position: relative;
+
+        .search-box {
+            max-width: 800px;
+            margin: 0 auto;
+            padding: 2rem;
+            background: white;
+            border-radius: 1rem;
             box-shadow: 0 5px 15px rgba(0,0,0,0.08);
-            border-radius: 8px;
-            background-color: white;
         }
-        .search-input {
-            height: 64px;
-            font-size: 1.2rem;
-            padding: 1rem 1.5rem;
-            border: none;
-            border-radius: 8px;
-            box-shadow: none;
-        }
-        .search-input:focus {
-            box-shadow: none;
-            border: 1px solid var(--accent-color);
-        }
-        .search-btn {
-            position: absolute;
-            right: 8px;
-            top: 8px;
-            height: 48px;
-            padding: 0 1.8rem;
-            font-size: 1rem;
-            background-color: var(--accent-color);
-            border: none;
-            border-radius: 6px;
-            color: white;
-            font-weight: 500;
-            transition: all 0.3s;
-            z-index: 10;
-        }
-        .search-btn:hover {
-            background-color: #2980b9;
-            transform: translateY(-2px);
-        }
-        .results-container {
-            display: none;
-            width: 100%;
-            padding: 1rem;
-            margin-top: 2rem;
-            max-width: 1200px;
-        }
+
         .book-card {
-            border-radius: 8px;
-            overflow: hidden;
-            box-shadow: 0 5px 15px rgba(0,0,0,0.08);
-            transition: all 0.3s;
             height: 100%;
-            background-color: white;
+            background: white;
             border: none;
+            border-radius: 1rem;
+            box-shadow: 0 5px 15px rgba(0,0,0,0.08);
+            transition: transform 0.3s ease;
         }
+
         .book-card:hover {
             transform: translateY(-5px);
-            box-shadow: 0 15px 30px rgba(0,0,0,0.1);
         }
+
         .card-img-container {
-            height: 220px;
+            height: 200px;
             overflow: hidden;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            background-color: #f8f8f8;
-            border-bottom: 1px solid #eee;
+            border-radius: 1rem 1rem 0 0;
+            background: #f8f9fa;
         }
+
         .card-img-container img {
-            max-height: 100%;
-            max-width: 100%;
+            width: 100%;
+            height: 100%;
             object-fit: contain;
         }
-        .card-body {
-            padding: 1.5rem;
-        }
+
         .book-title {
             font-weight: 600;
-            font-size: 1.1rem;
-            height: 2.6rem;
-            overflow: hidden;
-            text-overflow: ellipsis;
             display: -webkit-box;
             -webkit-line-clamp: 2;
             -webkit-box-orient: vertical;
-            color: var(--primary-color);
-            margin-bottom: 0.7rem;
+            overflow: hidden;
         }
-        .book-author {
-            color: var(--light-text);
-            font-size: 0.95rem;
-            margin-bottom: 0.7rem;
+
+        .notification {
+            position: fixed;
+            top: 20px;
+            right: 20px;
+            z-index: 1050;
+            min-width: 300px;
+            transform: translateX(100%);
+            transition: transform 0.3s ease;
         }
-        .book-details {
-            font-size: 0.85rem;
-            color: var(--light-text);
-            margin-bottom: 1.2rem;
+
+        .notification.show {
+            transform: translateX(0);
         }
-        .book-details p {
-            margin-bottom: 0.3rem;
+
+        .btn-primary {
+            background-color: var(--bs-primary);
+            border-color: var(--bs-primary);
         }
-        .download-btn {
-            background-color: var(--primary-color);
-            border: none;
-            border-radius: 6px;
-            width: 100%;
-            padding: 0.7rem;
-            transition: all 0.3s;
-            font-weight: 500;
-        }
-        .download-btn:hover {
+
+        .btn-primary:hover {
             background-color: #34495e;
+            border-color: #34495e;
         }
-        .email-modal .modal-content {
-            border-radius: 8px;
-            border: none;
-            box-shadow: 0 15px 30px rgba(0,0,0,0.15);
-        }
-        .email-modal .modal-header {
-            background-color: var(--primary-color);
-            color: white;
-            padding: 1rem 1.5rem;
-            border-bottom: none;
-        }
-        .email-modal .modal-body {
-            padding: 1.5rem;
-        }
-        .email-modal .modal-footer {
-            border-top: none;
-            padding: 1rem 1.5rem 1.5rem;
-        }
-        .email-modal .close {
-            color: white;
-            opacity: 0.8;
-        }
-        .email-modal .form-control {
-            height: 50px;
-            border-radius: 6px;
-        }
-        .spinner-overlay {
+
+        .loading-overlay {
             position: fixed;
             top: 0;
             left: 0;
             width: 100%;
             height: 100%;
-            background-color: rgba(255, 255, 255, 0.8);
+            background: rgba(255,255,255,0.8);
             display: flex;
             justify-content: center;
             align-items: center;
-            z-index: 9999;
+            z-index: 1040;
             visibility: hidden;
             opacity: 0;
             transition: all 0.3s;
         }
-        .spinner-overlay.show {
+
+        .loading-overlay.show {
             visibility: visible;
             opacity: 1;
         }
-        .spinner-border {
-            width: 3rem;
-            height: 3rem;
-            border-width: 0.25rem;
-        }
-        .no-results {
-            text-align: center;
-            padding: 3rem;
-            color: var(--light-text);
-            background-color: white;
-            border-radius: 8px;
-            box-shadow: 0 5px 15px rgba(0,0,0,0.08);
-        }
-        .note-text {
-            color: var(--light-text);
-            font-size: 0.9rem;
-            margin-top: 1rem;
-        }
-        .custom-notification {
-            position: fixed;
-            top: 20px;
-            right: 20px;
-            width: 350px;
-            background-color: white;
-            border-radius: 8px;
-            box-shadow: 0 5px 15px rgba(0,0,0,0.15);
-            z-index: 9999;
-            overflow: hidden;
-            transform: translateX(400px);
-            transition: transform 0.3s ease;
-        }
-        .custom-notification.show {
-            transform: translateX(0);
-        }
-        .notification-header {
-            padding: 12px 15px;
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            border-bottom: 1px solid #eee;
-        }
-        .notification-body {
-            padding: 15px;
-            font-size: 0.9rem;
-        }
-        .custom-notification.success .notification-header {
-            background-color: #f8fffa;
-        }
-        .custom-notification.error .notification-header {
-            background-color: #fff8f8;
-        }
-        .download-btn.disabled {
-            opacity: 0.7;
-            cursor: not-allowed;
-        }
-        
-        /* 导航栏样式 */
-        .navbar {
-            background-color: white;
-            box-shadow: 0 2px 10px rgba(0,0,0,0.05);
-            padding: 0.8rem 1rem;
-        }
-        .navbar-brand {
-            font-weight: 700;
-            color: var(--primary-color);
-        }
-        .nav-link {
-            color: var(--text-color);
-            transition: all 0.3s;
-            margin: 0 0.5rem;
-        }
-        .nav-link:hover {
-            color: var(--accent-color);
-        }
-        .btn-login, .btn-register {
-            border-radius: 50px;
-            padding: 0.4rem 1.2rem;
-            margin-left: 0.5rem;
-            font-weight: 500;
-        }
-        .btn-login {
-            border: 1px solid var(--accent-color);
-            color: var(--accent-color);
-            background-color: transparent;
-        }
-        .btn-login:hover {
-            background-color: var(--accent-color);
-            color: white;
-        }
-        .btn-register {
-            background-color: var(--accent-color);
-            color: white;
-            border: none;
-        }
-        .btn-register:hover {
-            background-color: #2980b9;
-        }
-        .user-info {
-            display: none;
-            align-items: center;
-        }
+
         .user-avatar {
             width: 32px;
             height: 32px;
             border-radius: 50%;
-            background-color: var(--accent-color);
+            background: var(--bs-primary);
             color: white;
             display: flex;
             align-items: center;
             justify-content: center;
-            margin-right: 0.5rem;
             font-weight: 600;
         }
-        .user-name {
-            font-weight: 600;
-            margin-right: 0.5rem;
-        }
+
         .vip-badge {
-            font-size: 0.7rem;
-            padding: 0.2rem 0.5rem;
-            background-color: #f1c40f;
+            background: var(--bs-warning);
             color: #7f5c00;
-            border-radius: 50px;
-            margin-right: 0.5rem;
-        }
-        .auth-modal .modal-content {
-            border-radius: 8px;
-            border: none;
-            box-shadow: 0 15px 30px rgba(0,0,0,0.15);
-        }
-        .auth-modal .modal-header {
-            border-bottom: none;
-            padding-bottom: 0;
-        }
-        .auth-modal .modal-body {
-            padding: 1.5rem;
-        }
-        .auth-modal .modal-footer {
-            border-top: none;
-            padding-top: 0;
-        }
-        .auth-form-group {
-            margin-bottom: 1.2rem;
-        }
-        .auth-form-group label {
-            font-weight: 500;
-            margin-bottom: 0.5rem;
-            color: var(--text-color);
-        }
-        .verify-code-container {
-            display: flex;
-        }
-        .verify-code-container input {
-            border-top-right-radius: 0;
-            border-bottom-right-radius: 0;
-        }
-        .btn-get-code {
-            border-top-left-radius: 0;
-            border-bottom-left-radius: 0;
-            flex-shrink: 0;
+            font-size: 0.75rem;
+            padding: 0.25rem 0.5rem;
+            border-radius: 2rem;
         }
     </style>
 </head>
 <body>
     <!-- 导航栏 -->
-    <nav class="navbar navbar-expand-lg navbar-light">
+    <nav class="navbar navbar-expand-lg navbar-light bg-white">
         <div class="container">
-            <a class="navbar-brand" href="#">图书搜索</a>
-            <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarNav" aria-controls="navbarNav" aria-expanded="false" aria-label="Toggle navigation">
+            <a class="navbar-brand fw-bold" href="#">图书搜索</a>
+            <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav">
                 <span class="navbar-toggler-icon"></span>
             </button>
             <div class="collapse navbar-collapse justify-content-end" id="navbarNav">
                 <div class="auth-buttons">
-                    <button class="btn btn-login" id="btnLogin">登录</button>
-                    <button class="btn btn-register" id="btnRegister">注册</button>
+                    <button class="btn btn-outline-primary me-2" id="btnLogin">登录</button>
+                    <button class="btn btn-primary" id="btnRegister">注册</button>
                 </div>
-                <div class="user-info">
-                    <div class="user-avatar"></div>
-                    <span class="user-name"></span>
-                    <span class="vip-badge">VIP0</span>
+                <div class="user-info d-none d-flex align-items-center">
+                    <div class="user-avatar me-2"></div>
+                    <span class="user-name me-2"></span>
+                    <span class="vip-badge me-3"></span>
                     <button class="btn btn-sm btn-outline-secondary" id="btnLogout">退出</button>
                 </div>
             </div>
         </div>
     </nav>
 
+    <!-- 搜索区域 -->
     <div class="search-container">
-        <div class="search-box">
-            <h1 class="search-title">图书搜索</h1>
-            <div class="search-input-container">
-                <input id="keyword" type="text" class="form-control search-input" placeholder="输入书名、作者或ISBN...">
-                <button id="search" class="btn search-btn">
-                    <i class="fas fa-search"></i> 搜索
-                </button>
+        <div class="container">
+            <div class="search-box text-center">
+                <h1 class="search-title">图书搜索</h1>
+                <div class="input-group mb-3">
+                    <input type="text" class="form-control form-control-lg" id="keyword" placeholder="输入书名、作者或ISBN...">
+                    <button class="btn btn-primary px-4" id="search">
+                        <i class="fas fa-search"></i> 搜索
+                    </button>
+                </div>
+                <p class="text-muted small">发送链接至邮箱，请确保邮箱地址正确</p>
             </div>
-            <p class="text-center note-text">发送链接至邮箱，请确保邮箱地址正确</p>
         </div>
     </div>
 
-    <div class="container results-container">
-        <div class="row" id="results-row">
-            <!-- 搜索结果将在这里以卡片形式显示 -->
-        </div>
+    <!-- 搜索结果 -->
+    <div class="container results-container d-none">
+        <div class="row g-4" id="results-row"></div>
     </div>
 
     <!-- 登录模态框 -->
-    <div class="modal fade auth-modal" id="loginModal" tabindex="-1" role="dialog" aria-hidden="true">
-        <div class="modal-dialog" role="document">
+    <div class="modal fade" id="loginModal" tabindex="-1">
+        <div class="modal-dialog">
             <div class="modal-content">
                 <div class="modal-header">
                     <h5 class="modal-title">登录</h5>
-                    <button type="button" class="close" data-dismiss="modal" aria-label="Close">
-                        <span aria-hidden="true">&times;</span>
-                    </button>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
                 </div>
                 <div class="modal-body">
                     <form id="loginForm">
-                        <div class="auth-form-group">
-                            <label for="loginEmail">邮箱地址</label>
-                            <input type="email" class="form-control" id="loginEmail" placeholder="请输入邮箱地址">
+                        <div class="mb-3">
+                            <label class="form-label">邮箱地址</label>
+                            <input type="email" class="form-control" id="loginEmail" required>
                         </div>
-                        <div class="auth-form-group">
-                            <label for="loginPassword">密码</label>
-                            <input type="password" class="form-control" id="loginPassword" placeholder="请输入密码">
+                        <div class="mb-3">
+                            <label class="form-label">密码</label>
+                            <input type="password" class="form-control" id="loginPassword" required>
                         </div>
-                        <div class="alert alert-danger" id="loginError" style="display: none;"></div>
+                        <div class="alert alert-danger d-none" id="loginError"></div>
                     </form>
                 </div>
                 <div class="modal-footer">
-                    <button type="button" class="btn btn-secondary" data-dismiss="modal">取消</button>
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">取消</button>
                     <button type="button" class="btn btn-primary" id="submitLogin">登录</button>
                 </div>
             </div>
@@ -440,78 +224,67 @@
     </div>
 
     <!-- 注册模态框 -->
-    <div class="modal fade auth-modal" id="registerModal" tabindex="-1" role="dialog" aria-hidden="true">
-        <div class="modal-dialog" role="document">
+    <div class="modal fade" id="registerModal" tabindex="-1">
+        <div class="modal-dialog">
             <div class="modal-content">
                 <div class="modal-header">
                     <h5 class="modal-title">注册</h5>
-                    <button type="button" class="close" data-dismiss="modal" aria-label="Close">
-                        <span aria-hidden="true">&times;</span>
-                    </button>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
                 </div>
                 <div class="modal-body">
                     <form id="registerForm">
-                        <div class="auth-form-group">
-                            <label for="registerEmail">邮箱地址</label>
-                            <input type="email" class="form-control" id="registerEmail" placeholder="请输入邮箱地址">
+                        <div class="mb-3">
+                            <label class="form-label">邮箱地址</label>
+                            <input type="email" class="form-control" id="registerEmail" required>
                         </div>
-                        <div class="auth-form-group">
-                            <label for="registerUsername">用户名</label>
-                            <input type="text" class="form-control" id="registerUsername" placeholder="请输入用户名">
+                        <div class="mb-3">
+                            <label class="form-label">用户名</label>
+                            <input type="text" class="form-control" id="registerUsername" required>
                         </div>
-                        <div class="auth-form-group">
-                            <label for="registerPassword">密码</label>
-                            <input type="password" class="form-control" id="registerPassword" placeholder="请输入密码">
+                        <div class="mb-3">
+                            <label class="form-label">密码</label>
+                            <input type="password" class="form-control" id="registerPassword" required>
                         </div>
-                        <div class="auth-form-group">
-                            <label for="registerVerificationCode">验证码</label>
-                            <div class="verify-code-container">
-                                <input type="text" class="form-control" id="registerVerificationCode" placeholder="请输入验证码">
-                                <button type="button" class="btn btn-outline-primary btn-get-code" id="getVerificationCode">获取验证码</button>
+                        <div class="mb-3">
+                            <label class="form-label">验证码</label>
+                            <div class="input-group">
+                                <input type="text" class="form-control" id="registerVerificationCode" required>
+                                <button type="button" class="btn btn-outline-primary" id="getVerificationCode">获取验证码</button>
                             </div>
                         </div>
-                        <div class="alert alert-danger" id="registerError" style="display: none;"></div>
+                        <div class="alert alert-danger d-none" id="registerError"></div>
                     </form>
                 </div>
                 <div class="modal-footer">
-                    <button type="button" class="btn btn-secondary" data-dismiss="modal">取消</button>
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">取消</button>
                     <button type="button" class="btn btn-primary" id="submitRegister">注册</button>
                 </div>
             </div>
         </div>
     </div>
 
-    <!-- 加载动画 -->
-    <div class="spinner-overlay" id="loading-spinner">
-        <div class="spinner-border text-primary" role="status">
-            <span class="sr-only">加载中...</span>
-        </div>
-    </div>
-
     <!-- 下载模态框 -->
-    <div class="modal fade email-modal" id="emailModal" tabindex="-1" role="dialog" aria-labelledby="emailModalLabel" aria-hidden="true">
-        <div class="modal-dialog" role="document">
+    <div class="modal fade" id="emailModal" tabindex="-1">
+        <div class="modal-dialog">
             <div class="modal-content">
                 <div class="modal-header">
-                    <h5 class="modal-title" id="emailModalLabel">下载书籍</h5>
-                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                    <h5 class="modal-title">下载书籍</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
                 </div>
                 <div class="modal-body">
                     <div class="mb-3">
-                        <label for="email" class="form-label">您的邮箱</label>
-                        <input type="email" class="form-control" id="email" placeholder="请输入您的邮箱，我们将发送下载链接到您的邮箱">
+                        <label class="form-label">您的邮箱</label>
+                        <input type="email" class="form-control" id="email" required>
                     </div>
                     <div class="mb-3">
-                        <label for="captchaCode" class="form-label">验证码</label>
+                        <label class="form-label">验证码</label>
                         <div class="input-group">
-                            <input type="text" class="form-control" id="captchaCode" placeholder="请输入验证码">
-                            <div class="input-group-append">
-                                <span class="input-group-text p-0 border-0">
-                                    <img id="captchaImage" src="" alt="验证码" style="height: 38px; cursor: pointer;">
-                                </span>
-                            </div>
+                            <input type="text" class="form-control" id="captchaCode" required>
+                            <span class="input-group-text p-0">
+                                <img id="captchaImage" src="" alt="验证码" style="height: 38px; cursor: pointer;">
+                            </span>
                         </div>
-                        <small class="form-text text-muted">看不清？点击图片刷新</small>
+                        <div class="form-text">看不清？点击图片刷新</div>
                     </div>
                     <input type="hidden" id="bookId">
                     <input type="hidden" id="bookHash">
@@ -525,553 +298,13 @@
         </div>
     </div>
 
-    <script src="js/jquery.min.js"></script>
-    <script src="js/bootstrap.min.js"></script>
-	<script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/2.11.6/umd/popper.min.js"></script>
-    <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>
+    <!-- 加载动画 -->
+    <div class="loading-overlay" id="loading-spinner">
+        <div class="spinner-border text-primary"></div>
+    </div>
 
-
-    <script>
-        // 配置API地址 - 根据实际部署情况修改
-        const API_BASE_URL = '/api';
-        
-        // 全局变量
-        var selectedBookId = '';
-        var selectedHashId = '';
-        var authToken = localStorage.getItem('authToken');
-        var currentUser = null;
-
-        // 检查用户登录状态
-        function checkLoginStatus() {
-            if (authToken) {
-                // 检查令牌有效性
-                $.ajax({
-                    type: "GET",
-                    url: `${API_BASE_URL}/check`,
-                    headers: {
-                        "Authorization": `Bearer ${authToken}`
-                    },
-                    success: function(res) {
-                        if (res.is_authenticated) {
-                            // 用户已登录
-                            currentUser = {
-                                username: res.username,
-                                email: res.email,
-                                vip_level: res.vip_level
-                            };
-                            updateUIForLoggedInUser();
-                        } else {
-                            // 令牌无效，清除本地存储
-                            localStorage.removeItem('authToken');
-                            authToken = null;
-                            updateUIForLoggedOutUser();
-                        }
-                    },
-                    error: function() {
-                        // 请求失败，清除本地存储
-                        localStorage.removeItem('authToken');
-                        authToken = null;
-                        updateUIForLoggedOutUser();
-                    }
-                });
-            } else {
-                updateUIForLoggedOutUser();
-            }
-        }
-
-        // 更新已登录用户的UI
-        function updateUIForLoggedInUser() {
-            $('.auth-buttons').hide();
-            $('.user-info').css('display', 'flex');
-            $('.user-avatar').text(currentUser.username.charAt(0).toUpperCase());
-            $('.user-name').text(currentUser.username);
-            $('.vip-badge').text(`VIP${currentUser.vip_level}`);
-        }
-
-        // 更新未登录用户的UI
-        function updateUIForLoggedOutUser() {
-            $('.auth-buttons').show();
-            $('.user-info').hide();
-        }
-
-        // 加载动画控制
-        function showLoading() {
-            $('#loading-spinner').addClass('show');
-        }
-
-        function hideLoading() {
-            $('#loading-spinner').removeClass('show');
-        }
-
-        // 刷新验证码
-        function refreshCaptcha() {
-            fetch('/api/captcha')
-                .then(response => response.json())
-                .then(data => {
-                    if (data.status === 0) {
-                        document.getElementById('captchaImage').src = data.image;
-                        document.getElementById('sessionKey').value = data.session_key;
-                    } else {
-                        showNotification('错误', '获取验证码失败: ' + data.message, 'error');
-                    }
-                })
-                .catch(error => {
-                    showNotification('错误', '获取验证码失败: ' + error, 'error');
-                });
-        }
-
-        // 点击验证码图片刷新
-        document.getElementById('captchaImage').addEventListener('click', refreshCaptcha);
-
-        // 检查用户是否已登录
-        function isAuthenticated() {
-            return authToken !== null;
-        }
-
-        // 点击下载按钮时弹出邮箱输入框
-        function showDownloadModal(bookId, bookHash) {
-            if (!isAuthenticated()) {
-                showNotification('提示', '请先登录后再下载书籍', 'error');
-                return;
-            }
-
-            const modal = document.getElementById('emailModal');
-            document.getElementById('bookId').value = bookId;
-            document.getElementById('bookHash').value = bookHash;
-            document.getElementById('email').value = currentUser.email || '';
-            
-            // 重置验证码输入框
-            document.getElementById('captchaCode').value = '';
-            
-            // 刷新验证码
-            refreshCaptcha();
-            
-            // 显示模态框
-            const modalInstance = new bootstrap.Modal(modal);
-            modalInstance.show();
-        }
-
-        // 确认下载
-        document.getElementById('downloadBtn').addEventListener('click', function() {
-            const email = document.getElementById('email').value;
-            const captchaCode = document.getElementById('captchaCode').value;
-            const bookId = document.getElementById('bookId').value;
-            const bookHash = document.getElementById('bookHash').value;
-
-            // 验证邮箱格式
-            if (!validateEmail(email)) {
-                showNotification('错误', '请输入有效的邮箱地址', 'error');
-                return;
-            }
-
-            // 验证验证码
-            if (!captchaCode) {
-                showNotification('错误', '请输入验证码', 'error');
-                return;
-            }
-
-            // 禁用下载按钮，防止重复点击
-            const downloadBtn = document.getElementById('downloadBtn');
-            downloadBtn.disabled = true;
-            downloadBtn.innerHTML = '<span class="spinner-border spinner-border-sm" role="status" aria-hidden="true"></span> 处理中...';
-
-            fetch('/api/download', {
-                method: 'POST',
-                headers: {
-                    'Content-Type': 'application/json',
-                    'Authorization': `Bearer ${getToken()}`
-                },
-                body: JSON.stringify({
-                    id: bookId,
-                    hash: bookHash,
-                    email: email,
-                    captcha_code: captchaCode
-                })
-            })
-            .then(response => response.json())
-            .then(data => {
-                // 恢复下载按钮状态
-                downloadBtn.disabled = false;
-                downloadBtn.innerHTML = '确认下载';
-
-                // 关闭模态框
-                const modal = bootstrap.Modal.getInstance(document.getElementById('emailModal'));
-                modal.hide();
-
-                if (data.status === 0) {
-                    // 禁用对应书籍的下载按钮
-                    const downloadBtns = document.querySelectorAll(`[data-book-id="${bookId}"]`);
-                    downloadBtns.forEach(btn => {
-                        btn.disabled = true;
-                        btn.innerHTML = '<i class="fas fa-check"></i> 已发送';
-                    });
-                    
-                    showNotification('成功', '下载链接已发送至您的邮箱，请查收！<br>如未收到请检查垃圾邮件。', 'success');
-                } else {
-                    showNotification('错误', data.error || '下载请求失败', 'error');
-                    
-                    // 刷新验证码
-                    refreshCaptcha();
-                }
-            })
-            .catch(error => {
-                // 恢复下载按钮状态
-                downloadBtn.disabled = false;
-                downloadBtn.innerHTML = '确认下载';
-                
-                showNotification('错误', '下载请求失败: ' + error, 'error');
-                
-                // 刷新验证码
-                refreshCaptcha();
-            });
-        });
-
-        // 通知提示函数
-        function showNotification(title, message, type) {
-            // 如果已有通知，先移除
-            $('.custom-notification').remove();
-            
-            const iconClass = type === 'success' ? 'fas fa-check-circle text-success' : 'fas fa-exclamation-circle text-danger';
-            const notificationHtml = `
-                <div class="custom-notification ${type}">
-                    <div class="notification-header">
-                        <i class="${iconClass}"></i> ${title}
-                        <button type="button" class="close" onclick="$(this).closest('.custom-notification').remove()">
-                            <span>&times;</span>
-                        </button>
-                    </div>
-                    <div class="notification-body">
-                        ${message}
-                    </div>
-                </div>
-            `;
-            
-            $('body').append(notificationHtml);
-            setTimeout(function() {
-                $('.custom-notification').addClass('show');
-            }, 10);
-            
-            // 5秒后自动消失
-            setTimeout(function() {
-                $('.custom-notification').removeClass('show');
-                setTimeout(function() {
-                    $('.custom-notification').remove();
-                }, 300);
-            }, 5000);
-        }
-
-        // CSRF Token 处理
-        let csrfToken = '';
-        
-        // 页面加载完成后获取 CSRF Token
-        $(document).ready(function() {
-            checkLoginStatus();
-            
-            // 获取 CSRF Token
-            $.ajax({
-                type: "GET",
-                url: `${API_BASE_URL}/check`,
-                crossDomain: true,
-                xhrFields: {
-                    withCredentials: true
-                },
-                success: function(res) {
-                    // 从响应头或响应体中获取 CSRF Token
-                    if (res && res.csrf_token) {
-                        csrfToken = res.csrf_token;
-                        console.log("CSRF Token 获取成功");
-                    } else {
-                        console.warn("服务器未返回 CSRF Token");
-                    }
-                },
-                error: function(err) {
-                    console.error("获取 CSRF Token 失败:", err);
-                }
-            });
-            
-            // 绑定登录按钮点击事件
-            $('#btnLogin').click(function() {
-                $('#loginModal').modal('show');
-            });
-            
-            // 绑定注册按钮点击事件
-            $('#btnRegister').click(function() {
-                $('#registerModal').modal('show');
-            });
-            
-            // 绑定退出按钮点击事件
-            $('#btnLogout').click(function() {
-                localStorage.removeItem('authToken');
-                authToken = null;
-                currentUser = null;
-                updateUIForLoggedOutUser();
-                showNotification('提示', '您已成功退出登录', 'success');
-            });
-            
-            // 绑定登录表单提交事件
-            $('#submitLogin').click(function() {
-                const $btn = $(this);
-                if ($btn.hasClass('disabled')) return;
-                
-                const email = $('#loginEmail').val();
-                const password = $('#loginPassword').val();
-                
-                if (!email || !password) {
-                    $('#loginError').text('请输入邮箱和密码').show();
-                    return;
-                }
-                
-                $btn.addClass('disabled').html('<i class="fas fa-spinner fa-spin"></i> 登录中...');
-                
-                $.ajax({
-                    type: "POST",
-                    url: `${API_BASE_URL}/login`,
-                    contentType: "application/json",
-                    data: JSON.stringify({
-                        email: email,
-                        password: password
-                    }),
-                    success: function(res) {
-                        $btn.removeClass('disabled').text('登录');
-                        
-                        if (res.status === 0) {
-                            // 登录成功
-                            localStorage.setItem('authToken', res.token);
-                            authToken = res.token;
-                            currentUser = {
-                                username: res.username,
-                                email: res.email,
-                                vip_level: res.vip_level
-                            };
-                            
-                            $('#loginModal').modal('hide');
-                            $('#loginForm')[0].reset();
-                            $('#loginError').hide();
-                            
-                            updateUIForLoggedInUser();
-                            showNotification('成功', '登录成功', 'success');
-                        } else {
-                            // 登录失败
-                            $('#loginError').text(res.message).show();
-                        }
-                    },
-                    error: function() {
-                        $btn.removeClass('disabled').text('登录');
-                        $('#loginError').text('登录失败，请稍后重试').show();
-                    }
-                });
-            });
-            
-            // 绑定注册表单提交事件
-            $('#submitRegister').click(function() {
-                const $btn = $(this);
-                if ($btn.hasClass('disabled')) return;
-                
-                const email = $('#registerEmail').val();
-                const username = $('#registerUsername').val();
-                const password = $('#registerPassword').val();
-                const verificationCode = $('#registerVerificationCode').val();
-                
-                if (!email || !username || !password || !verificationCode) {
-                    $('#registerError').text('请填写所有字段').show();
-                    return;
-                }
-                
-                $btn.addClass('disabled').html('<i class="fas fa-spinner fa-spin"></i> 注册中...');
-                
-                $.ajax({
-                    type: "POST",
-                    url: `${API_BASE_URL}/register`,
-                    contentType: "application/json",
-                    data: JSON.stringify({
-                        email: email,
-                        username: username,
-                        password: password,
-                        verification_code: verificationCode
-                    }),
-                    success: function(res) {
-                        $btn.removeClass('disabled').text('注册');
-                        
-                        if (res.status === 0) {
-                            // 注册成功
-                            localStorage.setItem('authToken', res.token);
-                            authToken = res.token;
-                            currentUser = {
-                                username: res.username,
-                                email: res.email,
-                                vip_level: res.vip_level
-                            };
-                            
-                            $('#registerModal').modal('hide');
-                            $('#registerForm')[0].reset();
-                            $('#registerError').hide();
-                            
-                            updateUIForLoggedInUser();
-                            showNotification('成功', '注册成功', 'success');
-                        } else {
-                            // 注册失败
-                            $('#registerError').text(res.message).show();
-                        }
-                    },
-                    error: function() {
-                        $btn.removeClass('disabled').text('注册');
-                        $('#registerError').text('注册失败，请稍后重试').show();
-                    }
-                });
-            });
-            
-            // 获取注册验证码
-            $('#getVerificationCode').click(function() {
-                const $btn = $(this);
-                if ($btn.hasClass('disabled')) return;
-                
-                const email = $('#registerEmail').val();
-                if (!email) {
-                    $('#registerError').text('请先输入邮箱地址').show();
-                    return;
-                }
-                
-                $btn.addClass('disabled').text('发送中...');
-                
-                $.ajax({
-                    type: "POST",
-                    url: `${API_BASE_URL}/send-verification-code`,
-                    contentType: "application/json",
-                    data: JSON.stringify({
-                        email: email
-                    }),
-                    success: function(res) {
-                        if (res.status === 0) {
-                            // 发送成功
-                            showNotification('成功', res.message, 'success');
-                            
-                            // 按钮倒计时
-                            let countdown = 60;
-                            const timer = setInterval(function() {
-                                $btn.text(`${countdown}秒后重试`);
-                                countdown--;
-                                if (countdown < 0) {
-                                    clearInterval(timer);
-                                    $btn.removeClass('disabled').text('获取验证码');
-                                }
-                            }, 1000);
-                        } else {
-                            // 发送失败
-                            $btn.removeClass('disabled').text('获取验证码');
-                            $('#registerError').text(res.message).show();
-                        }
-                    },
-                    error: function() {
-                        $btn.removeClass('disabled').text('获取验证码');
-                        $('#registerError').text('发送验证码失败，请稍后重试').show();
-                    }
-                });
-            });
-        });
-        
-        // 添加 CSRF Token 到 AJAX 请求
-        $.ajaxSetup({
-            beforeSend: function(xhr, settings) {
-                // 只对非 GET 请求添加 CSRF Token
-                if (!/^(GET|HEAD|OPTIONS|TRACE)$/i.test(settings.type) && csrfToken) {
-                    xhr.setRequestHeader("X-CSRFToken", csrfToken);
-                }
-                // 添加Authorization头
-                if (authToken) {
-                    xhr.setRequestHeader("Authorization", `Bearer ${authToken}`);
-                }
-            }
-        });
-
-        // 搜索功能
-        $("#search").click(function() {
-            // 检查用户是否已登录
-            if (!authToken) {
-                showNotification('提示', '请先登录后再搜索书籍', 'error');
-                $('#loginModal').modal('show');
-                return;
-            }
-            
-            const keyword = $("#keyword").val();
-            if (!keyword.trim()) {
-                showNotification('错误', '请输入搜索关键词', 'error');
-                return;
-            }
-            
-            showLoading();
-            $.ajax({
-                type: "post",
-                contentType: "application/json",
-                url: `${API_BASE_URL}/search`,
-                data: JSON.stringify({ "keyword": keyword }),
-                dataType: "json",
-                success: function(res) {
-                    hideLoading();
-                    
-                    // 显示结果容器
-                    $('.search-container').addClass('results-shown');
-                    $('.results-container').show();
-                    
-                    // 清空之前的结果
-                    $('#results-row').empty();
-                    
-                    // 检查是否有错误消息
-                    if (res.length === 1 && res[0].error) {
-                        $('#results-row').html(`<div class="col-12 no-results"><h3>搜索失败</h3><p>${res[0].error}</p></div>`);
-                        return;
-                    }
-                    
-                    // 如果没有结果
-                    if (!res || res.length === 0) {
-                        $('#results-row').html('<div class="col-12 no-results"><h3>没有找到相关书籍</h3><p>请尝试使用其他关键词搜索</p></div>');
-                        return;
-                    }
-                    
-                    // 渲染书籍卡片
-                    res.forEach(function(book) {
-                        const coverImg = book.cover ? book.cover : 'img/default-cover.jpg';
-                        const html = `
-                            <div class="col-md-4 col-lg-3 mb-4">
-                                <div class="book-card">
-                                    <div class="card-img-container">
-                                        <img src="${coverImg}" alt="${book.title}" onerror="this.src='img/default-cover.jpg'">
-                                    </div>
-                                    <div class="card-body">
-                                        <h5 class="book-title">${book.title}</h5>
-                                        <p class="book-author">${book.author || '未知作者'}</p>
-                                        <div class="book-details">
-                                            <p>出版社: ${book.publisher || '未知'}</p>
-                                            <p>语言: ${book.language || '未知'}</p>
-                                            <p>年份: ${book.year || '未知'}</p>
-                                            <p>格式: ${book.extension || '未知'} (${book.filesizeString || '未知大小'})</p>
-                                        </div>
-                                        <button class="btn btn-primary download-btn" 
-                                            onclick="showDownloadModal('${book.id}', '${book.hash}')"
-                                            data-id="${book.id}" 
-                                            data-hash="${book.hash}">
-                                            <i class="fas fa-download"></i> 发送至邮箱
-                                        </button>
-                                    </div>
-                                </div>
-                            </div>
-                        `;
-                        $('#results-row').append(html);
-                    });
-                },
-                error: function(err) {
-                    hideLoading();
-                    showNotification('错误', '搜索失败，请稍后重试', 'error');
-                    console.error("Error during search:", err);
-                }
-            });
-        });
-
-        // 按回车键搜索
-        $("#keyword").keypress(function(e) {
-            if (e.which === 13) {
-                $("#search").click();
-            }
-        });
-    </script>
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+    <script src="js/app.js"></script>
 </body>
 </html> 
