@@ -148,6 +148,67 @@
             padding: 0.25rem 0.5rem;
             border-radius: 2rem;
         }
+
+        /* 公告弹窗样式 */
+        #announcementModal .modal-content {
+            border-radius: 1rem;
+            overflow: hidden;
+        }
+
+        #announcementModal .modal-header {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            padding: 1.5rem;
+        }
+
+        #announcementModal .modal-title i {
+            font-size: 1.2rem;
+            animation: pulse 2s infinite;
+        }
+
+        @keyframes pulse {
+            0% { transform: scale(1); }
+            50% { transform: scale(1.1); }
+            100% { transform: scale(1); }
+        }
+
+        #announcementModal .announcement-content {
+            font-size: 1rem;
+            line-height: 1.6;
+        }
+
+        #announcementModal .alert {
+            background: rgba(255, 193, 7, 0.1);
+            border-left: 4px solid #ffc107;
+            border-radius: 0.5rem;
+        }
+
+        #announcementModal .contact-items {
+            background: #f8f9fa;
+            padding: 1rem;
+            border-radius: 0.5rem;
+            border: 1px solid #e9ecef;
+        }
+
+        #announcementModal .contact-item {
+            display: flex;
+            align-items: center;
+            padding: 0.5rem 0;
+        }
+
+        #announcementModal .contact-item i {
+            width: 20px;
+            text-align: center;
+        }
+
+        #announcementModal .btn {
+            border-radius: 0.5rem;
+            padding: 0.5rem 1.5rem;
+            font-weight: 500;
+        }
+
+        #announcementModal .modal-dialog {
+            max-width: 500px;
+        }
     </style>
 </head>
 <body>
@@ -192,6 +253,57 @@
     <!-- 搜索结果 -->
     <div class="container results-container d-none">
         <div class="row g-4" id="results-row"></div>
+    </div>
+
+    <!-- 公告弹窗 -->
+    <div class="modal fade" id="announcementModal" tabindex="-1" data-bs-backdrop="static" data-bs-keyboard="false">
+        <div class="modal-dialog modal-dialog-centered">
+            <div class="modal-content border-0 shadow">
+                <div class="modal-header bg-primary text-white border-0">
+                    <h5 class="modal-title d-flex align-items-center">
+                        <i class="fas fa-bullhorn me-2"></i>
+                        重要公告
+                    </h5>
+                    <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"></button>
+                </div>
+                <div class="modal-body p-4">
+                    <div class="announcement-content">
+                        <div class="alert alert-warning mb-3 border-0 shadow-sm">
+                            <div class="d-flex align-items-start">
+                                <i class="fas fa-exclamation-triangle text-warning me-3 mt-1"></i>
+                                <div>
+                                    <h6 class="alert-heading mb-2">服务迁移中</h6>
+                                    <p class="mb-0">服务器到期，正迁移服务中，有问题请邮件联系 admin@c1ker.top，或klpa图书群联系作者</p>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="contact-info">
+                            <h6 class="text-muted mb-3">联系方式：</h6>
+                            <div class="contact-items">
+                                <div class="contact-item mb-2">
+                                    <i class="fas fa-envelope text-primary me-2"></i>
+                                    <span class="fw-semibold">邮箱：</span>
+                                    <a href="mailto:admin@c1ker.top" class="text-decoration-none">admin@c1ker.top</a>
+                                </div>
+                                <div class="contact-item">
+                                    <i class="fas fa-users text-success me-2"></i>
+                                    <span class="fw-semibold">klpa、微信群：</span>
+                                    <span class="text-muted">图书馆群</span>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="modal-footer border-0 pt-0">
+                    <button type="button" class="btn btn-outline-secondary me-2" id="dontShowAgain">
+                        <i class="fas fa-times me-1"></i>不再显示
+                    </button>
+                    <button type="button" class="btn btn-primary" data-bs-dismiss="modal">
+                        <i class="fas fa-check me-1"></i>我知道了
+                    </button>
+                </div>
+            </div>
+        </div>
     </div>
 
     <!-- 登录模态框 -->

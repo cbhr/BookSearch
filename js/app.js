@@ -24,7 +24,8 @@ let modals = {
     registerModal: null,
     downloadModal: null,
     forgotPasswordModal: null,
-    resetPasswordModal: null
+    resetPasswordModal: null,
+    announcementModal: null
 };
 
 // 验证码会话密钥
@@ -275,6 +276,9 @@ const app = {
         
         // 绑定事件
         this.bindEvents();
+        
+        // 显示公告弹窗
+        this.showAnnouncementModal();
     },
     
     initModals() {
@@ -287,6 +291,7 @@ const app = {
                 const downloadModalEl = document.getElementById('emailModal');
                 const forgotPasswordModalEl = document.getElementById('forgotPasswordModal');
                 const resetPasswordModalEl = document.getElementById('resetPasswordModal');
+                const announcementModalEl = document.getElementById('announcementModal');
                 
                 if (loginModalEl) {
                     modals.loginModal = new bootstrap.Modal(loginModalEl);
@@ -312,6 +317,11 @@ const app = {
                     modals.resetPasswordModal = new bootstrap.Modal(resetPasswordModalEl);
                     console.log('重置密码模态框初始化成功 (Bootstrap 5)');
                 }
+                
+                if (announcementModalEl) {
+                    modals.announcementModal = new bootstrap.Modal(announcementModalEl);
+                    console.log('公告模态框初始化成功 (Bootstrap 5)');
+                }
             } else if (typeof $ !== 'undefined' && typeof $.fn.modal !== 'undefined') {
                 // 回退到 Bootstrap 4 (jQuery) 方式
                 console.log('使用 jQuery 初始化模态框 (Bootstrap 4)');
@@ -320,6 +330,7 @@ const app = {
                 $('#emailModal').modal({show: false});
                 $('#forgotPasswordModal').modal({show: false});
                 $('#resetPasswordModal').modal({show: false});
+                $('#announcementModal').modal({show: false});
                 
                 // 创建兼容的接口
                 modals.loginModal = { 
@@ -345,6 +356,11 @@ const app = {
                 modals.resetPasswordModal = {
                     show: () => $('#resetPasswordModal').modal('show'),
                     hide: () => $('#resetPasswordModal').modal('hide')
+                };
+                
+                modals.announcementModal = {
+                    show: () => $('#announcementModal').modal('show'),
+                    hide: () => $('#announcementModal').modal('hide')
                 };
             } else {
                 console.warn('未能找到 Bootstrap Modal API，模态框可能无法正常工作');
@@ -933,6 +949,36 @@ const app = {
         } finally {
             submitBtn.disabled = false;
             submitBtn.textContent = '重置密码';
+        }
+    },
+    
+    showAnnouncementModal() {
+        // 检查用户是否选择不再显示公告
+        const dontShowAnnouncement = localStorage.getItem('dontShowAnnouncement');
+        if (dontShowAnnouncement === 'true') {
+            return;
+        }
+        
+        // 延迟显示公告，确保页面完全加载
+        setTimeout(() => {
+            if (modals.announcementModal) {
+                modals.announcementModal.show();
+            } else {
+                $('#announcementModal').modal('show');
+            }
+        }, 500);
+        
+        // 绑定"不再显示"按钮事件
+        const dontShowBtn = document.getElementById('dontShowAgain');
+        if (dontShowBtn) {
+            dontShowBtn.addEventListener('click', () => {
+                localStorage.setItem('dontShowAnnouncement', 'true');
+                if (modals.announcementModal) {
+                    modals.announcementModal.hide();
+                } else {
+                    $('#announcementModal').modal('hide');
+                }
+            });
         }
     }
 };
