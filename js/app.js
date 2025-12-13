@@ -1,6 +1,6 @@
 // 配置
 const API_BASE_URL = window.location.hostname === 'localhost' ? 'http://localhost:8080/api' : 
-                     (window.location.hostname === 'book.godmap.site' ? '/api' : '/api');
+                     (window.location.hostname === 'book.laiye.site' ? '/api' : '/api');
 
 // 状态管理
 const state = {
