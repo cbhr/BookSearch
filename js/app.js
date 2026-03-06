@@ -1,5 +1,5 @@
 // 配置
-const API_BASE_URL = window.location.hostname === 'localhost' ? 'http://localhost:8080/api' : 
+const API_BASE_URL = window.location.hostname === 'localhost' ? 'http://localhost:8000/api' : 
                      (window.location.hostname === 'book.laiye.site' ? '/api' : '/api');
 
 // 状态管理
@@ -17,6 +17,7 @@ const elements = {
     resultsRow: document.getElementById('results-row'),
     loadingSpinner: document.getElementById('loading-spinner')
 };
+
 
 // 模态框实例
 let modals = {
